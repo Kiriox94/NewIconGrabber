@@ -1,0 +1,35 @@
+<brls:AppletFrame
+    iconInterpolation="linear"
+    footerHidden="false"
+    headerHidden="true">
+
+    <AutoTabFrame
+            id="main/tabFrame"
+            grow="1"
+            tabBackgroundColor="@theme/color/grey_1"
+            disableNavigationDown="true"
+            defaultTab="0"
+            sidebarPosition="top"
+            title="NewIconGrabber"
+            icon="@res/icon/icon.jpg">
+
+        <Tab label="Installed Games"
+                fontSize="18"
+                icon="@res/img/apps.svg">
+            <GameListView/>
+        </Tab>
+
+        <Tab label="Local Icons"
+                fontSize="18"
+                icon="@res/img/folder.svg">
+            <LocalIconsView/>
+        </Tab>
+
+        <Tab label="Settings"
+                fontSize="18"
+                icon="@res/img/settings.svg">
+            <SettingsTab/>
+        </Tab>
+        </AutoTabFrame>
+    <!-- <GameListView/> -->
+</brls:AppletFrame>

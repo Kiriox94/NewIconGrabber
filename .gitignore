@@ -1,0 +1,9 @@
+.vscode/
+.xmake/
+build/
+
+*.zip
+*.nro
+*.elf
+*.bin
+*.nacp
