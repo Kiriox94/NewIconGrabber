@@ -39,17 +39,15 @@ RecyclingGridItem* IconData::cellForRow(RecyclingGrid* recycler, size_t index)
 {
     auto cell = (IconCell*)recycler->dequeueReusableCell("Cell");
     // brls::Logger::info("Cell width: {}", cell->getWidth());
-    // Image::fromUrl(cell->image, icons[index].first, icons[index].second);
 
     std::string url = icons[index];
     int tex = brls::TextureCache::instance().getCache(url);
+    cell->image->setFreeTexture(false);
     if (tex > 0) {
         cell->image->innerSetImage(tex);
     } else {
         cell->image->setImageFromRes("img/placeholder.png");
         cell->ptrLock();
-        cell->image->ptrLock();
-        // cell->image->setFreeTexture(false);
         ThreadsManager::getImagesPool().detach_task([cell, url]() {
             try {
                 CURL* curl;
@@ -66,8 +64,8 @@ RecyclingGridItem* IconData::cellForRow(RecyclingGrid* recycler, size_t index)
 
                     brls::sync([cell, url, imageBuffer] {
                         cell->image->setImageFromMem(reinterpret_cast<const unsigned char*>(imageBuffer.data()), imageBuffer.size());
-                        // brls::TextureCache::instance().addCache(url, cell->image->getTexture());
-                        // cell->image->ptrUnlock();
+                        brls::TextureCache::instance().addCache(url, cell->image->getTexture());
+                        cell->ptrUnlock();
                     });
                 }
             } catch (const std::exception& ex) {
