@@ -35,9 +35,9 @@ namespace config {
     inline ParsedConfig settings;
 
     inline std::vector<AssetProfil> allowedAssetProfiles = {
-        {"Square", 7, 150, 48, {"512x512", "1024x1024"}},
-        {"Vertical", 7, 210, 48, {"600x900", "660x930", "342x482"}},
-        {"Horizontal", 4, 150, 48, {"460x215", "920x430"}}
+        {"Square", 7, 150, 42, {"512x512", "1024x1024"}},
+        {"Vertical", 7, 210, 42, {"600x900", "660x930", "342x482"}},
+        {"Horizontal", 4, 130, 48, {"460x215", "920x430"}}
     };
     inline std::vector<std::string> allowedAssetStyles = {
         "all",
