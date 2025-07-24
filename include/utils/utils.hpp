@@ -12,8 +12,6 @@ namespace utils {
     std::string formatApplicationId(u64 ApplicationId);
     std::string formatStringsArray(std::vector<std::string> input, std::string separator);
 
-    Result nacpGetLanguageEntrySpecialLanguage(NacpStruct* nacp, NacpLanguageEntry** langentry, SetLanguage LanguageChoosen);
-
     size_t write_to_string(void* ptr, size_t size, size_t nmemb, std::string stream);
     size_t write_to_file(void* ptr, size_t size, size_t nmemb, FILE* stream);
     size_t write_to_memory(void *contents, size_t size, size_t nmemb, void *userp);

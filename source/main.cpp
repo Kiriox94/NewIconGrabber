@@ -1,11 +1,11 @@
 #include <borealis.hpp>
 #include <switch.h>
-#include <curl/curl.h>
 #include <filesystem>
 #include <iostream>
 #include "utils/config.hpp"
 #include <nxtc.h>
 #include <borealis/core/cache_helper.hpp>
+#include "utils/thread.hpp"
 
 #include "activity/main_activity.hpp"
 #include "views/settings_tab.hpp"
@@ -57,7 +57,9 @@ int main(int argc, char* argv[]) {
 
     brls::Application::pushActivity(new MainActivity());
 
-    while(brls::Application::mainLoop());
+    while (brls::Application::mainLoop());
+    ThreadPool::instance().stop();
+
     exit();
     return -1;
 }
@@ -78,7 +80,6 @@ void init() {
     psmInitialize();
     nifmInitialize(NifmServiceType_User);
     lblInitialize();
-    curl_global_init(CURL_GLOBAL_ALL);
 }
 
 void exit() {
@@ -96,5 +97,4 @@ void exit() {
     fsExit();
     plExit();
     socketExit();
-    curl_global_cleanup();
 }

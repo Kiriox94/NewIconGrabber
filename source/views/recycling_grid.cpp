@@ -79,11 +79,6 @@ RecyclingGrid::RecyclingGrid() {
     this->hintLabel->detach();
     this->hintLabel->setFontSize(14);
     this->hintLabel->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    this->hintButton = new brls::Button();
-    this->hintButton->detach();
-    this->hintButton->setText("hints/back"_i18n);
-    this->hintButton->setFocusable(true);
-    this->hintButton->setAlignSelf(brls::AlignSelf::CENTER);
 
     // Create Refresh button
     this->refreshButton = new ButtonRefresh();
@@ -148,8 +143,6 @@ RecyclingGrid::~RecyclingGrid() {
     this->hintImage = nullptr;
     if (this->hintLabel) this->hintLabel->freeView();
     this->hintLabel = nullptr;
-    if (this->hintButton) this->hintButton->freeView();
-    this->hintButton = nullptr;
     delete this->dataSource;
     for (const auto& it : queueMap) {
         for (auto item : *it.second) {
@@ -174,14 +167,12 @@ void RecyclingGrid::draw(NVGcontext* vg, float x, float y, float width, float he
 
     if (!this->dataSource || this->dataSource->getItemCount() == 0) {
         if (!this->hintImage) return;
-        float w1 = hintImage->getWidth(), w2 = hintLabel->getWidth(), w3 = hintButton->getWidth();
-        float h1 = hintImage->getHeight(), h2 = hintLabel->getHeight(), h3 = hintButton->getHeight();
+        float w1 = hintImage->getWidth(), w2 = hintLabel->getWidth();
+        float h1 = hintImage->getHeight(), h2 = hintLabel->getHeight();
         this->hintImage->setAlpha(this->getAlpha());
         this->hintImage->draw(vg, x + (width - w1) / 2, y + (height - h1) / 2, w1, h1, style, ctx);
         this->hintLabel->setAlpha(this->getAlpha());
         this->hintLabel->draw(vg, x + (width - w2) / 2, y + (height + h1) / 2, w2, h2, style, ctx);
-        this->hintButton->setAlpha(this->getAlpha());
-        this->hintButton->draw(vg, x + (width - w3) / 2, y + (height + h2) / 2, w3, h3, style, ctx);
     }
 }
 

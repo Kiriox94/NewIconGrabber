@@ -4,8 +4,7 @@
 #include <borealis/core/cache_helper.hpp>
 #include "utils/SGDB.hpp"
 #include "utils/config.hpp"
-#include <curl/curl.h>
-#include "utils/threads_manager.hpp"
+#include "utils/image_helper.hpp"
 
 std::vector<SGDBEntry> games;
 std::string tid;
@@ -44,33 +43,8 @@ brls::RecyclerCell* SGDBData::cellForRow(brls::RecyclerFrame* recycler, brls::In
     SGDBCell* cell = (SGDBCell*)recycler->dequeueReusableCell("Cell");
     cell->label->setText(!game.year.empty() ? fmt::format("{} ({})", game.name, game.year) : game.name);
 
-    if(config::settings.displaySearchResultsIcons && !game.iconUrl.empty()) {
-        cell->image->setImageFromRes("img/borealis_96.png");
-        ThreadsManager::getImagesPool().detach_task([cell, game]() {
-            try {
-                CURL* curl;
-                std::vector<char> imageBuffer;
-                CURLcode res;
-                curl = curl_easy_init();
-                if (curl)
-                {
-                    curl_easy_setopt(curl, CURLOPT_URL, game.iconUrl.c_str());
-                    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, utils::write_to_memory);
-                    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &imageBuffer);
-                    res = curl_easy_perform(curl);
-                    curl_easy_cleanup(curl);
-
-                    brls::sync([cell, game, imageBuffer] {
-                        cell->image->setImageFromMem(reinterpret_cast<const unsigned char*>(imageBuffer.data()), imageBuffer.size());
-                        brls::TextureCache::instance().addCache(game.iconUrl, cell->image->getTexture());
-                    });
-                }
-            } catch (const std::exception& ex) {
-                cell->image->setImageFromRes("img/error.png");
-                brls::Logger::error("request image {} {}", game.iconUrl, ex.what());
-            }
-        });
-    }else cell->image->setImageFromRes("img/borealis_96.png");
+    cell->image->setImageFromRes("img/borealis_96.png");
+    if(config::settings.displaySearchResultsIcons && !game.iconUrl.empty()) ImageHelper::with(cell->image, game.iconUrl);
     return cell;
 }
 

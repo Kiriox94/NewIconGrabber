@@ -11,7 +11,7 @@ add_defines(
 
 add_rules("mode.debug", "mode.release")
 
-add_requires("borealis", "libnx", "libcurl", "lunasvg", "thread-pool", "nxtc")
+add_requires("borealis", "libnx", "libcurl", "lunasvg", "nxtc")
 
 target("NewIconGrabber")
     set_kind("binary")
@@ -33,4 +33,4 @@ target("NewIconGrabber")
 
     add_files("source/**.cpp")
     add_includedirs("include")
-    add_packages("borealis", "libnx", "libcurl", "lunasvg", "thread-pool", "nxtc")
+    add_packages("borealis", "libnx", "libcurl", "lunasvg", "nxtc")

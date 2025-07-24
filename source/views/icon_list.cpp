@@ -4,9 +4,9 @@
 #include "utils/SGDB.hpp"
 #include "views/game_list.hpp"
 #include "utils/config.hpp"
-#include "utils/threads_manager.hpp"
 #include "activity/main_activity.hpp"
-#include "curl/curl.h"
+#include "utils/image_helper.hpp"
+#include "utils/thread.hpp"
 
 std::string titleId;
 
@@ -41,39 +41,8 @@ RecyclingGridItem* IconData::cellForRow(RecyclingGrid* recycler, size_t index)
     // brls::Logger::info("Cell width: {}", cell->getWidth());
 
     std::string url = icons[index];
-    int tex = brls::TextureCache::instance().getCache(url);
-    cell->image->setFreeTexture(false);
-    if (tex > 0) {
-        cell->image->innerSetImage(tex);
-    } else {
-        cell->image->setImageFromRes("img/placeholder.png");
-        cell->ptrLock();
-        ThreadsManager::getImagesPool().detach_task([cell, url]() {
-            try {
-                CURL* curl;
-                std::vector<char> imageBuffer;
-                CURLcode res;
-                curl = curl_easy_init();
-                if (curl)
-                {
-                    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-                    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, utils::write_to_memory);
-                    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &imageBuffer);
-                    res = curl_easy_perform(curl);
-                    curl_easy_cleanup(curl);
-
-                    brls::sync([cell, url, imageBuffer] {
-                        cell->image->setImageFromMem(reinterpret_cast<const unsigned char*>(imageBuffer.data()), imageBuffer.size());
-                        brls::TextureCache::instance().addCache(url, cell->image->getTexture());
-                        cell->ptrUnlock();
-                    });
-                }
-            } catch (const std::exception& ex) {
-                // cell->image->setImageFromRes("img/error.png");
-                brls::Logger::error("request image {} {}", url, ex.what());
-            }
-        });
-    }
+    cell->image->setImageFromRes("img/placeholder.png");
+    ImageHelper::with(cell->image, url);
     return cell;
 }
 
@@ -89,22 +58,12 @@ void IconData::onItemSelected(RecyclingGrid* recycler, size_t index)
             std::string outPath = utils::getIconPath(tid);
             try
             {
-                CURL* curl;
-                std::vector<unsigned char> imageBuffer;
-                CURLcode res;
-                curl = curl_easy_init();
-                if (curl)
-                {
-                    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-                    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, utils::write_to_memory);
-                    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &imageBuffer);
-                    res = curl_easy_perform(curl);
-                    curl_easy_cleanup(curl);
-                    utils::overwriteIcon(outPath, "", imageBuffer);
-                    brls::Application::notify("Icon applied");
-                    brls::Application::popActivity();
-                    brls::Application::pushActivity(new MainActivity());
-                }
+                std::string response = HTTP::get(url);
+                std::vector<uint8_t> imageBuffer(response.begin(), response.end());
+                utils::overwriteIcon(outPath, "", imageBuffer);
+                brls::Application::notify("Icon applied");
+                brls::Application::popActivity();
+                brls::Application::pushActivity(new MainActivity());
             }
             catch(const std::exception& e)
             {
@@ -160,10 +119,9 @@ IconListView::IconListView(long SGDBGameId, std::string tid) {
     recycler->onNextPage([this] {
         if (currentPage < pagesCount) {
             currentPage++;
-            ThreadsManager::getRequestsPool().detach_task([this]() { requestAssets(); });
+            ThreadPool::instance().submit([this](HTTP& s) { this->requestAssets(); });
         }
     });
-    // ThreadsManager::getRequestsPool().detach_task([this]() { requestAssets(); });
     requestAssets();
 }
 
@@ -172,21 +130,21 @@ IconListView::~IconListView() {
 }
 
 void IconListView::requestAssets() {
-    SGDB::SearchResult result = SGDB::getAssetsForGame(
-        gameId, 
-        "grid", 
-        config::allowedSortsOrders[sortOrder].first, 
-        config::getCurrentAssetProfil().assetResolutions, 
-        {config::getCurrentAssetStyle()}, 
-        config::getCurrentAssetProfil().pageSize, 
-        currentPage, 
-        config::settings.nsfw
-    );
-
     std::string title = "";
     std::vector<std::string> icons;
     
     try{
+        SGDB::SearchResult result = SGDB::getAssetsForGame(
+            gameId, 
+            "grid", 
+            config::allowedSortsOrders[sortOrder].first, 
+            config::getCurrentAssetProfil().assetResolutions, 
+            {config::getCurrentAssetStyle()}, 
+            config::getCurrentAssetProfil().pageSize, 
+            currentPage, 
+            config::settings.nsfw
+        );
+
         if (result.total <= 0) {
             title = "No icons found.";
             recycler->setEmpty();
@@ -199,9 +157,9 @@ void IconListView::requestAssets() {
                 icons.push_back(url);
             }
         }
-    }catch (const SGDB::ApiException& e) {
+    }catch (const std::exception& e) {
         title = "Failed to fetch icons.";
-        recycler->setError(e.what());
+        recycler->setError(fmt::format("Request error: {}", e.what()));
     }
     
     brls::sync([this, title, icons]() {

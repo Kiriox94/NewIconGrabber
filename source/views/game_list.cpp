@@ -42,14 +42,13 @@ RecyclingGridItem* GameData::cellForRow(RecyclingGrid* recycler, size_t index)
     }
 
     std::string iconPath = utils::getIconPath(tid);
-    if (fs::exists(iconPath)) cell->registerAction("Remove custom icon", brls::ControllerButton::BUTTON_Y, [iconPath](brls::View* view) {
+    if (fs::exists(iconPath) && !selectCallback) cell->registerAction("Remove custom icon", brls::ControllerButton::BUTTON_Y, [iconPath](brls::View* view) {
         view->setActionAvailable(brls::ControllerButton::BUTTON_Y, false);
         if (!fs::exists(iconPath)) return false;
         fs::path iconDirectory = fs::path(iconPath).parent_path();
         brls::Application::notify("Custom icon removed");
         fs::remove(iconPath);
-        // If the game content directory is empty, remove it
-        for (auto& e : std::filesystem::directory_iterator(iconDirectory)) return true;
+        for (auto& e : std::filesystem::directory_iterator(iconDirectory)) return true; // If the game content directory is empty, remove it
         fs::remove(iconDirectory);
         return true;
     });
@@ -67,7 +66,6 @@ void GameData::onItemSelected(RecyclingGrid* recycler, size_t index)
         recycler->present(new SearchGamesView(games[index]->name, tid));
     }else {
         selectCallback(tid);
-        recycler->getParent()->getAppletFrame()->popContentView();
     }
 }
 
