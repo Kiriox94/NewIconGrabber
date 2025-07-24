@@ -36,7 +36,7 @@ namespace config {
 
     inline std::vector<AssetProfil> allowedAssetProfiles = {
         {"Square", 7, 150, 42, {"512x512", "1024x1024"}},
-        {"Vertical", 7, 210, 42, {"600x900", "660x930", "342x482"}},
+        {"Vertical", 7, 230, 42, {"600x900", "660x930", "342x482"}},
         {"Horizontal", 4, 130, 48, {"460x215", "920x430"}}
     };
     inline std::vector<std::string> allowedAssetStyles = {
