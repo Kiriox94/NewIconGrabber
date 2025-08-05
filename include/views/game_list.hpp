@@ -18,13 +18,15 @@ public:
 class GameData : public RecyclingGridDataSource
 {
 public:
-  GameData();
+;
+  GameData(std::function<void(std::string)> callback);
   size_t getItemCount() override;
   RecyclingGridItem *cellForRow(RecyclingGrid *recycler, size_t index) override;
   void onItemSelected(RecyclingGrid *recycler, size_t index) override;
   void clearData() override;
 
 private:
+  std::function<void(std::string)> selectCallback;
   std::vector<NxTitleCacheApplicationMetadata*> games;
 };
 
@@ -36,5 +38,6 @@ public:
   static brls::View *create();
 
 private:
+  std::function<void(std::string)> selectCallback;
   BRLS_BIND(RecyclingGrid, recycler, "recycler");
 };

@@ -3,7 +3,6 @@
 #include <borealis/core/cache_helper.hpp>
 #include "utils/appMetadataHelper.hpp"
 
-std::function<void(std::string)> selectCallback;
 
 GameCell::GameCell()
 {
@@ -20,7 +19,8 @@ void GameCell::onFocusLost() {
     label->setSingleLine(true);
 }
 
-GameData::GameData() {
+GameData::GameData(std::function<void(std::string)> callback) {
+    selectCallback = callback;
     games = appMetadataHelper::getInstalledGames();
     brls::Logger::debug("GameData Init: {} games found", games.size());
 }
@@ -83,7 +83,7 @@ GameListView::GameListView(std::function<void(std::string)> callback) {
     recycler->estimatedRowHeight = 150;
     recycler->spanCount = 7;
     recycler->registerCell("Cell", []() { return new GameCell();});
-    recycler->setDataSource(new GameData());
+    recycler->setDataSource(new GameData(callback));
 }
 
 void GameListView::onCreate() {
