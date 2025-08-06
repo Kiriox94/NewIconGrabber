@@ -81,7 +81,7 @@ void IconData::onItemSelected(RecyclingGrid* recycler, size_t index)
 }
 
 void IconData::appendData(std::vector<std::string> data) {
-    icons.reserve(icons.size() + data.size()); // optimisation mémoire
+    icons.reserve(icons.size() + data.size()); // memory optimisation
     icons.insert(icons.end(), data.begin(), data.end());
 }
 
