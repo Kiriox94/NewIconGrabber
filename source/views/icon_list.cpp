@@ -65,6 +65,10 @@ void IconData::onItemSelected(RecyclingGrid* recycler, size_t index)
                 brls::Application::popActivity();
                 brls::Application::pushActivity(new MainActivity());
             }
+            catch(const utils::OverwriteIconException e)
+            {
+                brls::Application::notify(fmt::format("Icon Error: {}", e.what()));
+            }
             catch(const std::exception& e)
             {
                 brls::Application::notify("Error: Icon not applied");

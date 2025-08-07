@@ -21,7 +21,19 @@ namespace utils {
     std::string clearSpecialCharacters(std::string input);
     std::optional<u64> extractTitleIDFromString(const std::string& input);
 
+    void writeToVector(void* context, void* data, int size);
+    bool writeJpegUnderSize(const std::string& outPath, int width, int height, int channels, unsigned char* data, int maxSize);
     void overwriteIcon(std::string outPath, std::string imagePath = "", std::vector<unsigned char> imageBuffer= {});
+
+    class OverwriteIconException : public std::exception {
+        public:
+            explicit OverwriteIconException(const std::string& message) : msg_(message) {}
+            const char* what() const noexcept override {
+                return msg_.c_str();
+            }
+        private:
+            std::string msg_;
+    };
 
     std::string capitalizeWords(std::string input);
     std::string toUpperString(const std::string str);

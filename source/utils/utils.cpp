@@ -1,6 +1,8 @@
 #include "utils/utils.hpp"
 #include <regex>
 #include <optional>
+#include <fstream>
+#include <iostream>
 
 #include "stb_image.h"
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
@@ -51,6 +53,31 @@ namespace utils
         return fmt::format("sdmc:/atmosphere/contents/{}/icon.jpg", tid);
     }
 
+    void writeToVector(void* context, void* data, int size) {
+        auto* buffer = static_cast<std::vector<unsigned char>*>(context);
+        unsigned char* bytes = static_cast<unsigned char*>(data);
+        buffer->insert(buffer->end(), bytes, bytes + size);
+    }
+
+    bool writeJpegUnderSize(const std::string& outPath, int width, int height, int channels, unsigned char* data, int maxSize) {
+        int quality = 100;
+        std::vector<unsigned char> buffer;
+
+        while (quality >= 45) {
+            buffer.clear();
+            stbi_write_jpg_to_func(writeToVector, &buffer, width, height, channels, data, quality);
+
+            if (buffer.size() < maxSize * 1024) {
+                std::ofstream out(outPath, std::ios::binary);
+                brls::Logger::info("Writing icon with quality {}", quality);
+                out.write(reinterpret_cast<char*>(buffer.data()), buffer.size());
+                return true;
+            }
+            quality -= 2;
+        }
+        return false;
+    }
+
     /**
      * @brief Overwrites the icon for a specific title ID with a new image.
      * 
@@ -70,13 +97,13 @@ namespace utils
         }else if (!imagePath.empty()) {
             img = stbi_load(imagePath.c_str(), &width, &height, &channels, 0);
         } else {
-            brls::Logger::error("[overwriteIcon] Both imageBuffer and imagePath are empty, please provide one.");
+            brls::Logger::error("Both imageBuffer and imagePath are empty, please provide one.");
             throw std::exception();
         }
 
         if (img == NULL)
         {
-            brls::Logger::error("[overwriteIcon] Image could not be loaded");
+            throw OverwriteIconException("Image could not be loaded");
         }
         else
         {
@@ -84,20 +111,17 @@ namespace utils
             data = (unsigned char*)malloc(256 * 256 * channels * sizeof(unsigned char));
 
             if (!stbir_resize_uint8_srgb(img, width, height, 0, data, 256, 256, 256 * channels, (stbir_pixel_layout)channels)){
-                brls::Logger::error("[overwriteIcon] Could not resize image");
-                throw std::exception();
+                throw OverwriteIconException("Could not resize image");
             }
 
             std::string outDir = fs::path(outPath).parent_path().string();
             if (!fs::exists(outDir) && !std::filesystem::create_directories(outDir)) {
-                brls::Logger::error("[overwriteIcon] Could not create directory: {}", outDir);
-                throw std::exception();
+                throw OverwriteIconException(fmt::format("Could not create directory: {}", outDir));
             }
 
-            if (!stbi_write_jpg(outPath.c_str(), 256, 256, channels, data, 100))
+            if (!writeJpegUnderSize(outPath, 256, 256, channels, data, 100))
             {
-                brls::Logger::error("[overwriteIcon] Could not write image");
-                throw std::exception();
+                throw OverwriteIconException("The selected image is too big");
             }
             stbi_image_free(img);
             free(data);
