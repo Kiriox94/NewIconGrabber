@@ -8,11 +8,13 @@
 #include "utils/thread.hpp"
 
 #include "activity/main_activity.hpp"
+#include "activity/appletmode_activity.hpp"
 #include "views/settings_tab.hpp"
 #include "views/game_list.hpp"
 #include "views/auto_tab_frame.hpp"
 #include "views/svg_image.hpp"
 #include "views/local_icons.hpp"
+#include "views/gallery_view.hpp"
 
 void init();
 void exit();
@@ -46,6 +48,7 @@ int main(int argc, char* argv[]) {
     brls::Application::registerXMLView("RecyclingGrid", RecyclingGrid::create);
     brls::Application::registerXMLView("AutoTabFrame", AutoTabFrame::create);
     brls::Application::registerXMLView("SVGImage", SVGImage::create);
+    brls::Application::registerXMLView("GalleryView", GalleryView::create);
 
     // Add custom values to the theme
     brls::Theme::getLightTheme().addColor("captioned_image/caption", nvgRGB(2, 176, 183));
@@ -54,8 +57,14 @@ int main(int argc, char* argv[]) {
     brls::Theme::getDarkTheme().addColor("color/grey_1", nvgRGB(51, 52, 53));
     brls::Theme::getLightTheme().addColor("color/grey_3", nvgRGBA(200, 200, 200, 16));
     brls::Theme::getDarkTheme().addColor("color/grey_3", nvgRGBA(160, 160, 160, 160));
+    brls::Theme::getLightTheme().addColor("font/grey", nvgRGB(148, 153, 160));
+    brls::Theme::getDarkTheme().addColor("font/grey", nvgRGB(148, 153, 160));
 
-    brls::Application::pushActivity(new MainActivity());
+    if (brls::Application::getPlatform()->isApplicationMode()) {
+        brls::Application::pushActivity(new MainActivity());
+    } else {
+        brls::Application::pushActivity(new AppletModeActivity());
+    }
 
     while (brls::Application::mainLoop());
     ThreadPool::instance().stop();

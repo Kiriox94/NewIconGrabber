@@ -10,7 +10,7 @@ size_t ThreadPool::max_thread_num = std::thread::hardware_concurrency();
 #elif defined(__PSV__)
 size_t ThreadPool::max_thread_num = 2;
 #else
-size_t ThreadPool::max_thread_num = 4;
+size_t ThreadPool::max_thread_num = 10;
 #endif
 
 ThreadPool::ThreadPool() {
