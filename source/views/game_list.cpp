@@ -1,7 +1,7 @@
 #include "views/game_list.hpp"
 #include "views/search_games.hpp"
 #include <borealis/core/cache_helper.hpp>
-#include "utils/appMetadataHelper.hpp"
+#include "utils/app_metadata_helper.hpp"
 
 
 GameCell::GameCell()

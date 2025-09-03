@@ -22,7 +22,6 @@ void exit();
 int main(int argc, char* argv[]) {     
     init();
     brls::Logger::setLogLevel(brls::LogLevel::LOG_DEBUG);
-    // brls::Application::enableDebuggingView(true);
 
     #ifdef NDEBUG //release
         // Using FILE* because brls::Logger::setLogOutput only takes FILE*, not std::ofstream

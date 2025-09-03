@@ -1,6 +1,6 @@
 #include "views/local_icons.hpp"
 #include "views/game_list.hpp"
-#include "utils/appMetadataHelper.hpp"
+#include "utils/app_metadata_helper.hpp"
 
 FileCell::FileCell()
 {
@@ -104,33 +104,32 @@ void FSData::didSelectRowAt(brls::RecyclerFrame* recycler, brls::IndexPath index
 
         auto foundTID = utils::extractTitleIDFromString(fileEntries[indexPath.row].path().filename().string());
         if (foundTID) {
-            auto gameTitle = appMetadataHelper::getMetadataFromTitleId(*foundTID)->name;
-            if (gameTitle) {
-                auto box   = new brls::Box();
-                auto img   = new brls::Image();
-                auto label = new brls::Label();
-                label->setText(fmt::format("Apply this icon to {}?", *gameTitle));
-                label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-                label->setMargins(20, 0, 10, 0);
-                img->setMaxHeight(400);
-                img->setImageFromFile(assetPath);
-                box->addView(img);
-                box->addView(label);
-                box->setAxis(brls::Axis::COLUMN);
-                box->setAlignItems(brls::AlignItems::CENTER);
-                box->setMargins(20, 20, 20, 20);
-                auto dialog = new brls::Dialog(box);
-                dialog->addButton("Yes", [foundTID, callback]() {
-                    callback(utils::formatApplicationId(*foundTID));
-                });
-                dialog->addButton("No", []() {});
-                dialog->addButton("To another game", [this, recycler, callback]() {
-                    auto* frame = new brls::AppletFrame(static_cast<brls::Box*>(new GameListView(callback)));
-                    brls::Application::pushActivity(new brls::Activity(frame));
-                });
-                dialog->open();
-                return;
-            }
+            std::string gameTitle = appMetadataHelper::getMetadataFromTitleId(*foundTID)->name;
+            // brls::Logger::info("Found title ID {} in filename, corresponding to game: {}", utils::formatApplicationId(*foundTID), gameTitle ? *gameTitle : "Unknown");
+            auto box   = new brls::Box();
+            auto img   = new brls::Image();
+            auto label = new brls::Label();
+            label->setText(fmt::format("Apply this icon to {}?", gameTitle));
+            label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+            label->setMargins(20, 0, 10, 0);
+            img->setMaxHeight(400);
+            img->setImageFromFile(assetPath);
+            box->addView(img);
+            box->addView(label);
+            box->setAxis(brls::Axis::COLUMN);
+            box->setAlignItems(brls::AlignItems::CENTER);
+            box->setMargins(20, 20, 20, 20);
+            auto dialog = new brls::Dialog(box);
+            dialog->addButton("Yes", [foundTID, callback]() {
+                callback(utils::formatApplicationId(*foundTID));
+            });
+            dialog->addButton("No", []() {});
+            dialog->addButton("To another game", [this, recycler, callback]() {
+                auto* frame = new brls::AppletFrame(static_cast<brls::Box*>(new GameListView(callback)));
+                brls::Application::pushActivity(new brls::Activity(frame));
+            });
+            dialog->open();
+            return;
         }
 
         auto* frame = new brls::AppletFrame(static_cast<brls::Box*>(new GameListView(callback)));

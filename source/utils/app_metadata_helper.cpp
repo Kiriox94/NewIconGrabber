@@ -1,7 +1,8 @@
-#include "utils/appMetadataHelper.hpp"
+#include "utils/app_metadata_helper.hpp"
 #include <switch.h>
 #include <sstream>
 #include <string.h> 
+#include <borealis/core/logger.hpp>
 
 namespace appMetadataHelper
 {
@@ -38,9 +39,12 @@ namespace appMetadataHelper
             if (!nxtcAddEntry(tid, &controlData.nacp, iconSize, controlData.icon, false)) {
                 return nullptr;
             }
+
+            brls::Logger::info("Added {} ({}) to title cache", tid, controlData.nacp.lang[0].name);
         }
 
         NxTitleCacheApplicationMetadata* metadata = nxtcGetApplicationMetadataEntryById(tid);
+        brls::Logger::info("{} fetched from title cache", metadata->name);
         return metadata;
     }
 } // namespace appMetadataHelper
