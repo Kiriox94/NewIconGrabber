@@ -3,6 +3,7 @@
 #include <switch.h>
 #include <filesystem>
 #include <nlohmann/json.hpp>
+#include <optional>
 
 extern const std::string HomeDir;
 

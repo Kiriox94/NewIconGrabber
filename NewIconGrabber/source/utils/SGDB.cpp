@@ -1,5 +1,6 @@
 #include "utils/SGDB.hpp"
 #include "utils/http.hpp"
+#include <fmt/format.h>
 
 const std::string BaseUrl = "https://www.steamgriddb.com/api/public/";
 

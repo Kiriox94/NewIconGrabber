@@ -40,7 +40,7 @@ namespace appMetadataHelper
                 return nullptr;
             }
 
-            brls::Logger::info("Added {} ({}) to title cache", tid, controlData.nacp.lang[0].name);
+            brls::Logger::verbose("Added {} ({}) to title cache", tid, controlData.nacp.lang[0].name);
         }
 
         NxTitleCacheApplicationMetadata* metadata = nxtcGetApplicationMetadataEntryById(tid);

@@ -1,5 +1,5 @@
 #pragma once
-#include "utils.hpp"
+#include <nlohmann/json.hpp>
 
 #define CONFIG_PATH "sdmc:/config/NewIconGrabber/config.json"
 

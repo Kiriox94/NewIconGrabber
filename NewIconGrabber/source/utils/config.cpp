@@ -1,6 +1,6 @@
 #include "utils/config.hpp"
 #include <fstream>
-
+#include <borealis/core/logger.hpp>
 
 namespace config {
     AssetProfil getCurrentAssetProfil() {
@@ -36,5 +36,6 @@ namespace config {
         nlohmann::json j = settings;
         o << j.dump(4) << std::endl;
         brls::Logger::info("Saved config");
+        o.close();
     }  
 } // namespace config

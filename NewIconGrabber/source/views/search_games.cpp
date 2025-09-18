@@ -50,7 +50,8 @@ brls::RecyclerCell* SGDBData::cellForRow(brls::RecyclerFrame* recycler, brls::In
 
 void SGDBData::didSelectRowAt(brls::RecyclerFrame* recycler, brls::IndexPath indexPath)
 {
-   if (games[indexPath.row].id != 0) recycler->present(new IconListView(games[indexPath.row].id, tid));
+    int tex = recycler->getAppletFrame()->getIcon()->getTexture();
+    if (games[indexPath.row].id != 0) recycler->present(new IconListView(games[indexPath.row].id, tid, tex));
 }
 
 SearchGamesView::SearchGamesView(std::string gameName, std::string titleId) {

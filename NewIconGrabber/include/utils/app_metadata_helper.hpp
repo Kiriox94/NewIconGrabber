@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <nxtc.h>
 #include <vector>
 

@@ -29,7 +29,7 @@ target("NewIconGrabber")
     set_values("switch.author", "Kiriox")
     set_values("switch.version", "1.0.0")
     set_values("switch.romfs", "resources")
-    set_values("switch.icon", "resources/icon/icon.jpg")
+    set_values("switch.icon", "resources/img/icon.jpg")
 
     add_files("source/**.cpp")
     add_includedirs("include")
