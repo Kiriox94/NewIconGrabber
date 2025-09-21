@@ -3,7 +3,7 @@
         {
             "type": "shell",
             "label": "CMake: Build and run active project",
-            "command": "/usr/bin/cmake --build build --target NewIconGrabber.nro --target run",
+            "command": "/usr/bin/cmake --build build --target run",
             "problemMatcher": [
                 "$gcc"
             ],
@@ -15,7 +15,7 @@
         {
             "type": "shell",
             "label": "CMake: Build active project",
-            "command": "/usr/bin/cmake --build build --target NewIconGrabber.nro --target run",
+            "command": "/usr/bin/cmake --build build",
             "problemMatcher": [
                 "$gcc"
             ],

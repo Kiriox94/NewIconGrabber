@@ -16,25 +16,36 @@
 #include "views/local_icons.hpp"
 #include "views/gallery_view.hpp"
 
-void init();
-void exit();
-
 int main(int argc, char* argv[]) {     
-    init();
-    brls::Logger::setLogLevel(brls::LogLevel::LOG_DEBUG);
+    for (int i = 1; i < argc; i++) {
+        if (std::strcmp(argv[i], "-d") == 0) {
+            brls::Logger::setLogLevel(brls::LogLevel::LOG_DEBUG);
+        } else if (std::strcmp(argv[i], "-v") == 0) {
+            brls::Logger::setLogLevel(brls::LogLevel::LOG_VERBOSE);
+        } else if (std::strcmp(argv[i], "-dv") == 0) {
+            brls::Application::enableDebuggingView(true);
+        } else if (std::strcmp(argv[i], "-o") == 0) {
+            const char* path = (i + 1 < argc) ? argv[++i] : "newicongrabber.log";
+            brls::Logger::setLogOutput(std::fopen(path, "w+"));
+        }
+    }
 
-    #ifdef NDEBUG //release
-        // Using FILE* because brls::Logger::setLogOutput only takes FILE*, not std::ofstream
-        FILE* logFile = fopen("sdmc:/config/NewIconGrabber/log.log", "w");
-        brls::Logger::setLogOutput(logFile);
-    #endif
+    // Init services
+#if __SWITCH__
+    nsInitialize();
+    nxtcInitialize();
+    if (brls::Logger::getLogLevel() >= brls::LogLevel::LOG_DEBUG) {
+        socketInitializeDefault();
+        nxlinkStdio();
+    }
+#endif
 
     if(!brls::Application::init()) {
         brls::Logger::error("Unable to init Borealis application");
+        return EXIT_FAILURE;
     }
 
     config::load();
-    brls::loadTranslations();
     brls::TextureCache::instance().cache.setCapacity(600);
 
     brls::Application::createWindow("NewIconGrabber");
@@ -59,50 +70,23 @@ int main(int argc, char* argv[]) {
     brls::Theme::getLightTheme().addColor("font/grey", nvgRGB(148, 153, 160));
     brls::Theme::getDarkTheme().addColor("font/grey", nvgRGB(148, 153, 160));
 
-    if (brls::Application::getPlatform()->isApplicationMode()) {
+    if (brls::Application::getPlatform()->isApplicationMode() && false) {
         brls::Application::pushActivity(new MainActivity());
     } else {
         brls::Application::pushActivity(new AppletModeActivity());
     }
 
     while (brls::Application::mainLoop());
+
+    // Exit services
     ThreadPool::instance().stop();
-
-    exit();
-    return -1;
-}
-
-void init() {
-    setsysInitialize();
-    socketInitializeDefault();
-    nxlinkStdio();
-    plInitialize(PlServiceType_User);
-    nsInitialize();
-    nxtcInitialize();
-    pmdmntInitialize();
-    pminfoInitialize();
-    splInitialize();
-    fsInitialize();
-    romfsInit();
-    setInitialize();
-    psmInitialize();
-    nifmInitialize(NifmServiceType_User);
-    lblInitialize();
-}
-
-void exit() {
-    lblExit();
-    nifmExit();
-    psmExit();
-    setExit();
-    romfsExit();
-    splExit();
-    pminfoExit();
-    pmdmntExit();
+#ifdef __SWITCH__
     nxtcExit();
     nsExit();
-    setsysExit();
-    fsExit();
-    plExit();
-    socketExit();
+    if (brls::Logger::getLogLevel() >= brls::LogLevel::LOG_DEBUG) {
+        socketExit();
+    }
+#endif
+
+    return EXIT_SUCCESS;
 }

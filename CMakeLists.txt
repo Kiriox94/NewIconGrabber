@@ -161,8 +161,9 @@ elseif (PLATFORM_SWITCH)
         COMMAND ${NX_ELF2NRO_EXE} ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro --icon=${PROJECT_ICON} --nacp=${PROJECT_NAME}.nacp --romfsdir=${CMAKE_BINARY_DIR}/resources
     )
 
+    find_program(NX_NXLINK_EXE NAMES nxlink HINTS "${DEVKITPRO}/tools/bin")
     add_custom_target(run DEPENDS ${PROJECT_NAME}
-        COMMAND nxlink ${PROJECT_NAME}.nro -s -r 20
+        COMMAND ${NX_NXLINK_EXE} ${PROJECT_NAME}.nro -s -r 20 --args -d
     )
 
 elseif (PLATFORM_IOS)

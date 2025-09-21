@@ -11,7 +11,7 @@
             defaultTab="0"
             sidebarPosition="top"
             title="NewIconGrabber"
-            icon="@res/icon/icon.jpg">
+            icon="@res/img/icon.jpg">
 
         <Tab label="Installed Games"
                 fontSize="18"

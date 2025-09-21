@@ -8,6 +8,7 @@
 #include <borealis/views/dialog.hpp>
 
 #include "activity/appletmode_activity.hpp"
+#include "activity/main_activity.hpp"
 #include "views/gallery_view.hpp"
 
 #ifdef BUILTIN_NSP
@@ -26,8 +27,14 @@ void AppletModeActivity::onContentAvailable() {
     gallery->setData({
         {"img/hint_game_1.png", "Select a game from home screen"},
         {"img/hint_game_2.png", "Hold the \uE0E5 key and click \uE0E0 to enter hbmenu"},
-        {"img/hint_hbmenu.png", "In the hbmenu, select wiliwili"},
+        {"img/hint_hbmenu.png", "In the hbmenu, select NewIconGrabber"},
     });
+
+    gallery->registerAction("Bypass", brls::BUTTON_BACK, [](brls::View*){
+        brls::Logger::debug("AppletModeActivity: Bypass to MainActivity");
+        brls::Application::pushActivity(new MainActivity());
+        return true;
+    }, true);
 }
 
 AppletModeActivity::~AppletModeActivity() { brls::Logger::debug("AppletModeActivity: delete"); }

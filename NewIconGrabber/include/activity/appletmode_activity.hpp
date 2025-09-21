@@ -19,8 +19,15 @@ public:
         headerHidden="true"
         footerHidden="true">
             <brls:Box
-                    width="100%"
-                    height="100%">
+                width="100%"
+                height="100%">
+
+                    <brls:Label
+                        positionType="absolute"
+                        positionTop="40"
+                        positionLeft="92"
+                        fontSize="28"
+                        text="This homebrew need to be run in applet mod, please relaunch it from an app"/>
                 <GalleryView
                         wireframe="false"
                         width="100%"
