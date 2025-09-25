@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
     brls::Theme::getLightTheme().addColor("font/grey", nvgRGB(148, 153, 160));
     brls::Theme::getDarkTheme().addColor("font/grey", nvgRGB(148, 153, 160));
 
-    if (brls::Application::getPlatform()->isApplicationMode() && false) {
+    if (brls::Application::getPlatform()->isApplicationMode()) {
         brls::Application::pushActivity(new MainActivity());
     } else {
         brls::Application::pushActivity(new AppletModeActivity());

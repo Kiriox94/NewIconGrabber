@@ -93,17 +93,14 @@ void IconData::clearData() {
     icons.clear();
 }
 
-IconListView::IconListView(long SGDBGameId, std::string tid, int iconTexture) {
+IconListView::IconListView(long SGDBGameId, std::string tid, std::string iconUrl) {
     gameId = SGDBGameId;
     titleId = tid;
     sortOrder = config::settings.sortOrder;
     this->inflateFromXMLRes("xml/views/game_list.xml");
 
     this->getAppletFrameItem()->title = "Loading…";
-    brls::Logger::info("Current icon texture: {}", iconTexture);
-    // if (iconTexture > 0) this->getAppletFrame()->getIcon()->setVisibility(brls::Visibility::VISIBLE);
-    // if (iconTexture > 0) this->getAppletFrame()->getIcon()->setImageFromRes("img/borealis_96.png");
-    // this->getAppletFrameItem()->setIconFromRes
+    this->getAppletFrameItem()->setIconFromTexture(brls::TextureCache::instance().getCache(iconUrl));
     utils::setHeaderVisibility(true);
 
     std::vector<std::string> sortOrderNames;

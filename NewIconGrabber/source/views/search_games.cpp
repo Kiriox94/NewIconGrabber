@@ -40,7 +40,7 @@ std::string SGDBData::titleForHeader(brls::RecyclerFrame* recycler, int section)
 brls::RecyclerCell* SGDBData::cellForRow(brls::RecyclerFrame* recycler, brls::IndexPath indexPath)
 {
     SGDBEntry game = games[indexPath.row];
-    SGDBCell* cell = (SGDBCell*)recycler->dequeueReusableCell("Cell");
+    auto* cell = (SGDBCell*)recycler->dequeueReusableCell("Cell");
     cell->label->setText(!game.year.empty() ? fmt::format("{} ({})", game.name, game.year) : game.name);
 
     cell->image->setImageFromRes("img/borealis_96.png");
@@ -50,8 +50,8 @@ brls::RecyclerCell* SGDBData::cellForRow(brls::RecyclerFrame* recycler, brls::In
 
 void SGDBData::didSelectRowAt(brls::RecyclerFrame* recycler, brls::IndexPath indexPath)
 {
-    int tex = recycler->getAppletFrame()->getIcon()->getTexture();
-    if (games[indexPath.row].id != 0) recycler->present(new IconListView(games[indexPath.row].id, tid, tex));
+    SGDBEntry game = games[indexPath.row];
+    if (game.id != 0) recycler->present(new IconListView(game.id, tid, game.iconUrl));
 }
 
 SearchGamesView::SearchGamesView(std::string gameName, std::string titleId) {
@@ -70,11 +70,6 @@ SearchGamesView::SearchGamesView(std::string gameName, std::string titleId) {
             entry.id = result.game.id;
             entry.name = result.game.name;
 
-            if (utils::toUpperString(entry.name) == utils::toUpperString(gameName) && foundGameId == 0 && config::settings.autoSelectIfPerfectMatch && !tid.empty()) {
-                brls::Logger::info("Perfect match found for {} with {}", entry.name, entry.id);
-                foundGameId = entry.id;
-            }
-
             if (result.game.releaseDate) {
                 std::tm* timeinfo = std::localtime(&result.game.releaseDate);
                 entry.year = std::to_string(timeinfo->tm_year + 1900);
@@ -82,6 +77,11 @@ SearchGamesView::SearchGamesView(std::string gameName, std::string titleId) {
 
             if (result.assets.size() > 0) {
                 entry.iconUrl = result.assets[0].thumb;
+            }
+
+            if (utils::toUpperString(entry.name) == utils::toUpperString(gameName) && foundGame.id == 0 && config::settings.autoSelectIfPerfectMatch && !tid.empty()) {
+                brls::Logger::info("Perfect match found for {} with {}", entry.name, entry.id);
+                foundGame = entry;
             }
 
             games.push_back(entry);
@@ -100,9 +100,10 @@ SearchGamesView::SearchGamesView(std::string gameName, std::string titleId) {
 }
 
 void SearchGamesView::onChildFocusGained(View* directChild, View* focusedView) {
-    brls::Box::onShowAnimationEnd();
-    if (foundGameId != 0) {
-        recycler->present(new IconListView(foundGameId, tid));
-        foundGameId = 0; // Reset to prevent auto select on next event call
+    if (foundGame.id != 0) {
+        brls::Logger::verbose("Auto selecting game {} with {}", foundGame.name, foundGame.id);
+        recycler->present(new IconListView(foundGame.id, tid, foundGame.iconUrl));
+        foundGame = {}; // Reset to prevent auto select on next event call
     }
+    brls::Box::onChildFocusGained(directChild, focusedView);
 }

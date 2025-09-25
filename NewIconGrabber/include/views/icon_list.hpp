@@ -25,7 +25,7 @@ class IconData : public RecyclingGridDataSource
 
 class IconListView : public brls::Box {
   public:
-    IconListView(long gameId, std::string tid = "", int iconTexture = 0);
+    IconListView(long gameId, std::string tid = "", std::string iconUrl = "");
     ~IconListView();
     void requestAssets();
   private:

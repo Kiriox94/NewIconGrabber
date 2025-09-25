@@ -3,7 +3,7 @@
 #include "svg_image.hpp"
 
 struct SGDBEntry{
-  long id;
+  long id = 0;
   std::string name;
   std::string year;
   std::string iconUrl;
@@ -37,6 +37,6 @@ class SearchGamesView : public brls::Box {
       SearchGamesView(std::string gameName, std::string titleId = "");
       void onChildFocusGained(View* directChild, View* focusedView) override;
     private:
-      int foundGameId = 0;
+      SGDBEntry foundGame;
       BRLS_BIND(brls::RecyclerFrame, recycler, "recycler");
 };
