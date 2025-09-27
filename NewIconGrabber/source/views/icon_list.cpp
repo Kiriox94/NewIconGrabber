@@ -99,8 +99,16 @@ IconListView::IconListView(long SGDBGameId, std::string tid, std::string iconUrl
     sortOrder = config::settings.sortOrder;
     this->inflateFromXMLRes("xml/views/game_list.xml");
 
+    int iconTex = brls::TextureCache::instance().getCache(iconUrl);
     this->getAppletFrameItem()->title = "Loading…";
-    this->getAppletFrameItem()->setIconFromTexture(brls::TextureCache::instance().getCache(iconUrl));
+    this->getAppletFrameItem()->setIconFromTexture(iconTex);
+
+    if (iconTex == 0) {
+        brls::delay(2000, [this, iconUrl]() {
+            this->getAppletFrameItem()->setIconFromTexture(brls::TextureCache::instance().getCache(iconUrl));
+            this->updateAppletFrameItem();
+        });
+    }
     utils::setHeaderVisibility(true);
 
     std::vector<std::string> sortOrderNames;
@@ -169,7 +177,8 @@ void IconListView::requestAssets() {
     
     brls::sync([this, title, icons]() {
         IconData* dataSource = dynamic_cast<IconData*>(recycler->getDataSource());
-        recycler->getParent()->getAppletFrame()->setTitle(title);
+        this->getAppletFrameItem()->title = title;
+        this->updateAppletFrameItem();
         
         if (dataSource && dataSource->getItemCount() > 0) {
             dataSource->appendData(icons);
