@@ -79,6 +79,7 @@ SearchGamesView::SearchGamesView(std::string gameName, std::string titleId) {
                 entry.iconUrl = result.assets[0].thumb;
             }
 
+            // Check for perfect match to auto select if enabled in config, only if titleId is provided to prevent auto select on generic searches
             if (utils::toUpperString(entry.name) == utils::toUpperString(gameName) && foundGame.id == 0 && config::settings.autoSelectIfPerfectMatch && !tid.empty()) {
                 brls::Logger::info("Perfect match found for {} with {}", entry.name, entry.id);
                 foundGame = entry;
@@ -100,7 +101,7 @@ SearchGamesView::SearchGamesView(std::string gameName, std::string titleId) {
 }
 
 void SearchGamesView::onChildFocusGained(View* directChild, View* focusedView) {
-    if (foundGame.id != 0) {
+    if (foundGame.id != 0) { // Check if match was found
         brls::Logger::verbose("Auto selecting game {} with {}", foundGame.name, foundGame.id);
         recycler->present(new IconListView(foundGame.id, tid, foundGame.iconUrl));
         foundGame = {}; // Reset to prevent auto select on next event call
