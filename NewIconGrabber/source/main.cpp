@@ -79,7 +79,8 @@ int main(int argc, char* argv[]) {
     while (brls::Application::mainLoop());
 
     // Exit services
-    ThreadPool::instance().stop();
+    // TODO: Find why this causes a crash on exit, maybe related to the fact that some threads are still running and accessing the thread pool when it is being destroyed?
+    // ThreadPool::instance().stop();
 #ifdef __SWITCH__
     nxtcExit();
     nsExit();
