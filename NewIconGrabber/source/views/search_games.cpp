@@ -1,5 +1,5 @@
 #include "views/search_games.hpp"
-#include "views/icon_list.hpp"
+#include "views/icons_grid.hpp"
 #include <ctime>
 #include <borealis/core/cache_helper.hpp>
 #include "utils/SGDB.hpp"

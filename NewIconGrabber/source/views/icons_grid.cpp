@@ -1,4 +1,4 @@
-#include "views/icon_list.hpp"
+#include "views/icons_grid.hpp"
 #include <nlohmann/json.hpp>
 #include <borealis/core/cache_helper.hpp>
 #include "utils/SGDB.hpp"
@@ -99,14 +99,27 @@ IconListView::IconListView(long SGDBGameId, std::string tid, std::string iconUrl
     sortOrder = config::settings.sortOrder;
     this->inflateFromXMLRes("xml/views/game_list.xml");
 
-    int iconTex = brls::TextureCache::instance().getCache(iconUrl);
     this->getAppletFrameItem()->title = "Loading…";
-    this->getAppletFrameItem()->setIconFromTexture(iconTex);
+    int iconTex = brls::TextureCache::instance().getCache(iconUrl);
 
-    if (iconTex == 0) {
-        brls::delay(2000, [this, iconUrl]() {
-            this->getAppletFrameItem()->setIconFromTexture(brls::TextureCache::instance().getCache(iconUrl));
-            this->updateAppletFrameItem();
+    // If icon is already cached, set it immediately.
+    // Otherwise, wait for it to be cached, by checking every 0.5s up to 5 times and set it there.
+    if (iconTex != 0) {
+        this->getAppletFrameItem()->setIconFromTexture(iconTex);
+    } else {
+        brls::async([this, iconUrl]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            for (int i = 0; i < 5; i++) {
+                int iconTex = brls::TextureCache::instance().getCache(iconUrl);
+                if (iconTex != 0) {
+                    brls::sync([this, iconTex]() {
+                        this->getAppletFrameItem()->setIconFromTexture(iconTex);
+                        this->updateAppletFrameItem();
+                    });
+                    return;
+                }
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            }
         });
     }
     utils::setHeaderVisibility(true);
