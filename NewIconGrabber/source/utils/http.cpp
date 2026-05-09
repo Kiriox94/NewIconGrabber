@@ -98,7 +98,7 @@ HTTP::HTTP() : chunk(nullptr) {
         ~Global() {
             curl_share_cleanup(this->share);
             curl_global_cleanup();
-            brls::Logger::debug("curl cleanup");
+            // brls::Logger::debug("curl cleanup");
         }
         // Avoids initalization order problems
         std::mutex init_lock;
