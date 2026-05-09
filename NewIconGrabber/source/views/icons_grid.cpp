@@ -53,7 +53,7 @@ size_t IconData::getItemCount() {
 void IconData::onItemSelected(RecyclingGrid* recycler, size_t index)
 {
     std::string url = icons[index];
-    auto callback = [url](std::string tid) {
+    auto callback = [recycler, url](std::string tid) {
         if (!tid.empty()) {
             std::string outPath = utils::getIconPath(tid);
             try
@@ -62,8 +62,7 @@ void IconData::onItemSelected(RecyclingGrid* recycler, size_t index)
                 std::vector<uint8_t> imageBuffer(response.begin(), response.end());
                 utils::overwriteIcon(outPath, "", imageBuffer);
                 brls::Application::notify("Icon applied");
-                brls::Application::popActivity();
-                brls::Application::pushActivity(new MainActivity());
+                recycler->getAppletFrame()->popToRootContentView();
             }
             catch(const utils::OverwriteIconException e)
             {
