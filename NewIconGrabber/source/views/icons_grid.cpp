@@ -79,8 +79,7 @@ void IconData::onItemSelected(RecyclingGrid* recycler, size_t index)
     if (!titleId.empty()) {
         callback(titleId);
     }else {
-        auto* frame = new brls::AppletFrame(static_cast<brls::Box*>(new GameListView(callback)));
-        brls::Application::pushActivity(new brls::Activity(frame));
+        recycler->present(new GameListView(callback));
     }
 }
 
