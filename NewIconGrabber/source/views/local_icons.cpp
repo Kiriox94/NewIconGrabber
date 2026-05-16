@@ -1,6 +1,9 @@
 #include "views/local_icons.hpp"
-#include "views/game_list.hpp"
+#include "utils/utils.hpp"
 #include "utils/app_metadata_helper.hpp"
+#include "views/game_list.hpp"
+#include "views/auto_tab_frame.hpp"
+#include "utils/icons_files_helper.hpp"
 
 FileCell::FileCell()
 {
@@ -17,7 +20,7 @@ FSData::FSData(LocalIconsView* view) {
     fileEntries.clear();
     directoryEntries.clear();
 
-    for (const auto& entry : fs::directory_iterator(view->currentDir)) {
+    for (const auto& entry : std::filesystem::directory_iterator(view->currentDir)) {
         std::vector<std::string> validExtensions = { ".jpg", ".jpeg", ".png" };
         if (entry.is_regular_file() && std::find(validExtensions.begin(), validExtensions.end(), entry.path().extension()) != validExtensions.end()) fileEntries.push_back(entry);
         if (entry.is_directory()) {
@@ -32,11 +35,11 @@ FSData::FSData(LocalIconsView* view) {
 
     hasDirectories = directoryEntries.size() > 0;
 
-    if (fileEntries.size() > 0) std::sort(fileEntries.begin(), fileEntries.end(), [](const fs::directory_entry& a, const fs::directory_entry& b) {
+    if (fileEntries.size() > 0) std::sort(fileEntries.begin(), fileEntries.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
         return a.path().filename().string() < b.path().filename().string();
     });
 
-    if (hasDirectories) std::sort(directoryEntries.begin(), directoryEntries.end(), [](const fs::directory_entry& a, const fs::directory_entry& b) {
+    if (hasDirectories) std::sort(directoryEntries.begin(), directoryEntries.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
         return a.path().filename().string() < b.path().filename().string();
     });
 }
@@ -89,10 +92,9 @@ void FSData::didSelectRowAt(brls::RecyclerFrame* recycler, brls::IndexPath index
         std::string assetPath = fileEntries[indexPath.row].path().string();
         auto callback = [assetPath](std::string tid) {
             if (!tid.empty()) {
-                std::string outPath = utils::getIconPath(tid);
                 try
                 {
-                    utils::overwriteIcon(outPath, assetPath);
+                    iconsFilesHelper::overwriteIcon(tid, assetPath);
                     brls::Application::notify("Icon applied");
                 }
                 catch(const std::exception& e)
@@ -149,7 +151,7 @@ void LocalIconsView::onCreate() {
     this->registerTabAction("Previous directory", brls::ControllerButton::BUTTON_X, [this](brls::View* view) {
         if (this->currentDir != INITIAL_DIRECTORY) {
             AutoTabFrame::focus2Sidebar(recycler->getParent());
-            this->currentDir = fs::path(currentDir).parent_path().string();
+            this->currentDir = std::filesystem::path(currentDir).parent_path().string();
             recycler->setDataSource(new FSData(this));
             return true;
         }

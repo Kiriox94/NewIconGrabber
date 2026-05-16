@@ -7,6 +7,8 @@
 #include "activity/main_activity.hpp"
 #include "utils/image_helper.hpp"
 #include "utils/thread.hpp"
+#include "utils/icons_files_helper.hpp"
+#include "utils/borealis_helper.hpp"
 
 std::string titleId;
 
@@ -55,16 +57,15 @@ void IconData::onItemSelected(RecyclingGrid* recycler, size_t index)
     std::string url = icons[index];
     auto callback = [recycler, url](std::string tid) {
         if (!tid.empty()) {
-            std::string outPath = utils::getIconPath(tid);
             try
             {
                 std::string response = HTTP::get(url);
                 std::vector<uint8_t> imageBuffer(response.begin(), response.end());
-                utils::overwriteIcon(outPath, "", imageBuffer);
+                iconsFilesHelper::overwriteIcon(tid, "", imageBuffer);
                 brls::Application::notify("Icon applied");
                 recycler->getAppletFrame()->popToRootContentView();
             }
-            catch(const utils::OverwriteIconException e)
+            catch(const iconsFilesHelper::OverwriteIconException e)
             {
                 brls::Application::notify(fmt::format("Icon Error: {}", e.what()));
             }

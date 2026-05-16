@@ -16,26 +16,39 @@ namespace config {
     }
 
     void load() {
-        if (std::filesystem::exists(CONFIG_PATH)) {
-            brls::Logger::info("Loading config from file");
-            std::ifstream i(CONFIG_PATH);
-            nlohmann::json j;
-            i >> j;
-            settings = j.get<ParsedConfig>();
-        } else {
-            brls::Logger::info("Using default config");
+        try {
+            if (std::filesystem::exists(CONFIG_PATH)) {
+                brls::Logger::info("Loading config from file");
+
+                std::ifstream i(CONFIG_PATH);
+
+                nlohmann::json j;
+                i >> j;
+
+                settings = j.get<ParsedConfig>();
+            } else {
+                brls::Logger::info("Using default config");
+            }
+        }
+        catch (const nlohmann::json::exception& e) {
+            brls::Logger::error("Error loading config: {}", e.what());
         }
     }
 
     void save() {
-        if (!std::filesystem::exists("sdmc:/config/NewIconGrabber/"))
-            if (!std::filesystem::create_directories("sdmc:/config/NewIconGrabber/"))
-                brls::Logger::error("Could not create config directory");
+        try {
+            if (!std::filesystem::exists("sdmc:/config/NewIconGrabber/"))
+                if (!std::filesystem::create_directories("sdmc:/config/NewIconGrabber/"))
+                    brls::Logger::error("Could not create config directory");
 
-        std::ofstream o(CONFIG_PATH);
-        nlohmann::json j = settings;
-        o << j.dump(4) << std::endl;
-        brls::Logger::info("Saved config");
-        o.close();
+            std::ofstream o(CONFIG_PATH);
+            nlohmann::json j = settings;
+            o << j.dump(4) << std::endl;
+            brls::Logger::info("Saved config");
+            o.close();
+        }
+        catch (const nlohmann::json::exception& e) {
+            brls::Logger::error("Error saving config: {}", e.what());
+        }
     }  
 } // namespace config

@@ -1,13 +1,10 @@
 #pragma once
-#include <borealis.hpp>
 #include <switch.h>
-#include <filesystem>
-#include <nlohmann/json.hpp>
 #include <optional>
+#include <fstream>
+#include <vector>
 
 extern const std::string HomeDir;
-
-namespace fs = std::filesystem;
 
 namespace utils {
     std::string formatApplicationId(u64 ApplicationId);
@@ -18,26 +15,11 @@ namespace utils {
     size_t write_to_memory(void *contents, size_t size, size_t nmemb, void *userp);
 
     std::string getFileExtension(std::string const& path);
-    std::string getIconPath(std::string tid);
     std::string clearSpecialCharacters(std::string input);
     std::optional<u64> extractTitleIDFromString(const std::string& input);
-
-    void writeToVector(void* context, void* data, int size);
-    bool writeJpegUnderSize(const std::string& outPath, int width, int height, int channels, unsigned char* data, int maxSize);
-    void overwriteIcon(std::string outPath, std::string imagePath = "", std::vector<unsigned char> imageBuffer= {});
-
-    class OverwriteIconException : public std::exception {
-        public:
-            explicit OverwriteIconException(const std::string& message) : msg_(message) {}
-            const char* what() const noexcept override {
-                return msg_.c_str();
-            }
-        private:
-            std::string msg_;
-    };
 
     std::string capitalizeWords(std::string input);
     std::string toUpperString(const std::string str);
 
-    void setHeaderVisibility(bool visible);
+    int getFirmwareMajor();
 }

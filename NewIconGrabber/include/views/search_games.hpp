@@ -1,6 +1,7 @@
 #pragma once
 #include "utils/utils.hpp"
 #include "svg_image.hpp"
+#include <borealis.hpp>
 
 struct SGDBEntry{
   long id = 0;

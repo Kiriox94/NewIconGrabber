@@ -1,9 +1,12 @@
 #pragma once
-#include "utils/utils.hpp"
-#include "auto_tab_frame.hpp"
+#include <borealis.hpp>
 #include "svg_image.hpp"
+#include <borealis.hpp>
+#include "views/auto_tab_frame.hpp"
+#include <vector>
+#include <filesystem>
 
-#define INITIAL_DIRECTORY HomeDir + "icons"
+#define INITIAL_DIRECTORY "sdmc:/config/NewIconGrabber/icons"
 
 class LocalIconsView : public AttachedView {
   public:
@@ -38,7 +41,7 @@ class FSData : public brls::RecyclerDataSource
     void didSelectRowAt(brls::RecyclerFrame* recycler, brls::IndexPath indexPath) override;
     std::string titleForHeader(brls::RecyclerFrame* recycler, int section) override;
   private:
-    std::vector<fs::directory_entry> directoryEntries;
-    std::vector<fs::directory_entry> fileEntries;
+    std::vector<std::filesystem::directory_entry> directoryEntries;
+    std::vector<std::filesystem::directory_entry> fileEntries;
     bool hasDirectories = false;
 };

@@ -5,46 +5,8 @@
 
 using namespace brls::literals;  // for _i18n
 
-template <typename T>
-T* addCell(brls::Box* container) {
-    T* cell = new T();
-    container->addView(cell);
-    return cell;
-}
-
-// brls::BooleanCell* addBooleanCell(brls::Box* container, std::string title, bool* setting) {
-//     auto* cell = addCell<brls::BooleanCell>(container);
-//     if (setting) {
-//         cell->init(title, *setting, [setting](bool enabled) {
-//             *setting = enabled;
-//             config::save();
-//         });
-//     } else {
-//         cell->setText(title);
-//     }
-//     return cell;
-// }
-
 #define ADD_BOOLEAN_SETTING(container, title, setting) addBooleanCell(container, title, *setting, [](bool e) {*setting = e;config::save();})
 #define ADD_SELECTOR_SETTING(container, title, setting, options) addSelectorCell(container, title, *setting, options, [](int s) {*setting = s;config::save();})
-
-template <typename Func>
-brls::BooleanCell* addBooleanCell(brls::Box* container, std::string title, bool defaultValue, Func callback) {
-    auto* cell = addCell<brls::BooleanCell>(container);
-    cell->init(title, defaultValue, callback);
-    return cell;
-}
-
-template <typename Func>
-brls::SelectorCell* addSelectorCell(brls::Box* container, std::string title, int defaultValue, std::vector<std::string> options, Func callback) {
-    auto* cell = addCell<brls::SelectorCell>(container);
-    if (options.size() > 0) {
-        cell->init(title, options, defaultValue, [](int s) {}, callback);
-    }else {
-        cell->setText(title);
-    }
-    return cell;
-}
 
 brls::Header* addHeader(brls::Box* container, std::string title, std::string subtitle = "") {
     auto* header = addCell<brls::Header>(container);
@@ -78,7 +40,7 @@ SettingsTab::SettingsTab()
     addHeader(container, "General");
     ADD_BOOLEAN_SETTING(container, "Display search results icons", &config::settings.displaySearchResultsIcons);
     ADD_BOOLEAN_SETTING(container, "Auto-select if perfect match", &config::settings.autoSelectIfPerfectMatch);
-    ADD_BOOLEAN_SETTING(container, "Use English game titles", &config::settings.useEnglishGamesTitle);
+    // ADD_BOOLEAN_SETTING(container, "Use English game titles", &config::settings.useEnglishGamesTitle);
 
     addHeader(container, "SteamGridDB");
     ADD_SELECTOR_SETTING(container, "Asset style", &config::settings.assetStyle, assetStyleNames);
@@ -102,7 +64,7 @@ SettingsTab::SettingsTab()
         brls::Logger::setLogLevel((brls::LogLevel)level);
     });
 
-    updatesystweakStatus();
+    // updatesystweakStatus();
 }
 
 brls::View* SettingsTab::create()
@@ -118,8 +80,8 @@ void SettingsTab::updatesystweakStatus() {
     std::string sysTweakActionStr = "Set up Sys-tweak";
     std::string sysTweakStatusStr = "Sys-tweak is not installed.";
 
-    if (fs::exists("sdmc:/atmosphere/contents/00FF747765616BFF/exefs.nsp")) {
-        if (!fs::exists("sdmc:/atmosphere/contents/00FF747765616BFF/flags/boot2.flag")) {
+    if (std::filesystem::exists("sdmc:/atmosphere/contents/00FF747765616BFF/exefs.nsp")) {
+        if (!std::filesystem::exists("sdmc:/atmosphere/contents/00FF747765616BFF/flags/boot2.flag")) {
             sysTweakStatusStr = "Sys-tweak is installed but not active.";
             sysTweakActionStr = "Activate Sys-tweak";
             sysTweakStatus = 1;
@@ -127,7 +89,7 @@ void SettingsTab::updatesystweakStatus() {
             sysTweakActionStr = "Re-install Sys-tweak";
             sysTweakStatusStr = "Sys-tweak is installed and active.";
             sysTweakStatus = 2;
-            if (fs::exists("sdmc:/atmosphere/contents/00FF747765616BFF/toolbox.json")) {
+            if (std::filesystem::exists("sdmc:/atmosphere/contents/00FF747765616BFF/toolbox.json")) {
                 std::ifstream i("sdmc:/atmosphere/contents/00FF747765616BFF/toolbox.json");
                 if (i.is_open()) {
                     nlohmann::json j;

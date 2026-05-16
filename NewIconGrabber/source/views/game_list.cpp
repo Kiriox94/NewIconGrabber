@@ -2,7 +2,8 @@
 #include "views/search_games.hpp"
 #include <borealis/core/cache_helper.hpp>
 #include "utils/app_metadata_helper.hpp"
-
+#include "utils/icons_files_helper.hpp"
+#include <filesystem>
 
 GameCell::GameCell()
 {
@@ -41,15 +42,23 @@ RecyclingGridItem* GameData::cellForRow(RecyclingGrid* recycler, size_t index)
         brls::TextureCache::instance().addCache(tid, cell->image->getTexture());
     }
 
-    std::string iconPath = utils::getIconPath(tid);
-    if (fs::exists(iconPath) && !selectCallback) cell->registerAction("Remove custom icon", brls::ControllerButton::BUTTON_Y, [iconPath](brls::View* view) {
+    std::string iconDir = iconsFilesHelper::getIconDir(tid);
+    std::string iconPath = fmt::format("{}/icon.jpg", iconDir);
+    if (std::filesystem::exists(iconPath) && !selectCallback) cell->registerAction("Remove custom icon", brls::ControllerButton::BUTTON_Y, [iconPath, iconDir](brls::View* view) {
         view->setActionAvailable(brls::ControllerButton::BUTTON_Y, false);
-        if (!fs::exists(iconPath)) return false;
-        fs::path iconDirectory = fs::path(iconPath).parent_path();
+        if (!std::filesystem::exists(iconPath)) return false;
+
+        if(!std::filesystem::remove(iconPath)) {
+            brls::Application::notify("Failed to remove icon");
+            return false;
+        }
+
         brls::Application::notify("Custom icon removed");
-        fs::remove(iconPath);
-        for (auto& e : std::filesystem::directory_iterator(iconDirectory)) return true; // If the game content directory is empty, remove it
-        fs::remove(iconDirectory);
+
+        std::string smallIconPath = fmt::format("{}/icon174.jpg", iconDir);
+        if (std::filesystem::exists(smallIconPath)) std::filesystem::remove(smallIconPath);
+
+        if (std::filesystem::is_empty(iconDir)) std::filesystem::remove(iconDir);
         return true;
     });
     return cell;
