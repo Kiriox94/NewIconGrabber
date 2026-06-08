@@ -728,7 +728,7 @@ float RecyclingGrid::getPaddingRight() {
 
 brls::View* RecyclingGrid::getDefaultFocus() {
     if (this->dataSource && this->dataSource->getItemCount() > 0) return ScrollingFrame::getDefaultFocus();
-    return nullptr;
+    return this;
 }
 
 brls::View* RecyclingGrid::create() { return new RecyclingGrid(); }
