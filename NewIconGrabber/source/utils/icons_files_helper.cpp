@@ -134,4 +134,8 @@ namespace iconsFilesHelper {
             stbi_image_free(img);
         }
     }
+
+    std::string getIconDir(std::string tid) {
+        return fmt::format("{}/atmosphere/contents/{}/", utils::getRootDirectory(), tid);
+    }
 }

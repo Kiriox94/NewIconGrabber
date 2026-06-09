@@ -103,6 +103,10 @@ if (PLATFORM_DESKTOP)
     if (NOT USE_LIBROMFS)
         add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}.data)
     endif ()
+
+    add_custom_target(run DEPENDS ${PROJECT_NAME}
+        COMMAND ${PROJECT_NAME} -d
+    )
 elseif (PLATFORM_PSV)
     set(VITA_MKSFOEX_FLAGS "${VITA_MKSFOEX_FLAGS} -d ATTRIBUTE2=12") # max heap size mode
     vita_create_self(${PROJECT_NAME}.self ${PROJECT_NAME} UNSAFE)
@@ -168,6 +172,7 @@ elseif (PLATFORM_SWITCH)
         COMMAND ${NX_NXLINK_EXE} ${PROJECT_NAME}.nro -s -r 20 --args -d
     )
 
+    list(APPEND APP_PLATFORM_LIB nxtc) # Only disponible on switch
 elseif (PLATFORM_IOS)
     ios_bundle(
             "${CMAKE_CURRENT_SOURCE_DIR}/demo/ios/iphoneos/Splash.storyboard"
@@ -186,4 +191,4 @@ endif ()
 
 target_include_directories(${PROJECT_NAME} PRIVATE NewIconGrabber ${APP_PLATFORM_INCLUDE})
 target_compile_options(${PROJECT_NAME} PRIVATE -ffunction-sections -fdata-sections ${APP_PLATFORM_OPTION})
-target_link_libraries(${PROJECT_NAME} PRIVATE borealis lunasvg curl nxtc z ${APP_PLATFORM_LIB})
+target_link_libraries(${PROJECT_NAME} PRIVATE borealis lunasvg curl z ${APP_PLATFORM_LIB})

@@ -1,19 +1,20 @@
 #include "utils/utils.hpp"
 #include <regex>
-#include <optional>
-#include <iostream>
-#include <iomanip>
 #include <numeric>
+#include <filesystem>
+#include <fmt/format.h>
+
+#ifdef _WIN32
+    #include <windows.h>
+    #include <shlobj.h>
+#elif defined(__linux__) || defined(__APPLE__)
+    #include <cstdlib>
+    #include <pwd.h>
+    #include <unistd.h>
+#endif
 
 namespace utils
 {
-    std::string formatApplicationId(u64 ApplicationId)
-    {
-        std::stringstream strm;
-        strm << std::uppercase << std::setfill('0') << std::setw(16) << std::hex << ApplicationId;
-        return strm.str();
-    }
-
     size_t write_to_string(void* ptr, size_t size, size_t nmemb, std::string stream)
     {
         size_t realsize = size * nmemb;
@@ -57,20 +58,6 @@ namespace utils
         return input;
     }
 
-    std::optional<u64> extractTitleIDFromString(const std::string& input) {
-        std::regex titleIdRegex(R"(0100[a-fA-F0-9]{12})");
-        std::smatch match;
-        u64 tid;
-
-        if (std::regex_search(input, match, titleIdRegex)) {
-            std::istringstream buffer(match.str());
-            buffer >> std::hex >> tid;
-            return tid; // Return first match
-        }
-
-        return std::nullopt; // No Title ID found
-    }
-
     std::string capitalizeWords(std::string input) {
         bool newWord = true;
         
@@ -93,6 +80,7 @@ namespace utils
     }
 
     int getFirmwareMajor() {
+#ifdef __SWITCH__
         static int cachedMajor = -1;
 
         if (cachedMajor == -1) {
@@ -107,5 +95,44 @@ namespace utils
         }
 
         return cachedMajor;
+#else
+        return 0;
+#endif
+    }
+
+
+    std::string getRootDirectory() {
+#ifdef __SWITCH__
+        return "sdmc:";
+#elif defined(__linux__) || defined(__APPLE__)
+
+#ifdef __linux__
+        std::filesystem::path localDir(".local/share");
+#elifdef __APPLE__
+        std::filesystem::path localDir("Library/Application Support");
+#endif
+
+        std::filesystem::path homeDir;
+        // Standard way
+        if (const char* home = std::getenv("HOME")) {
+            homeDir = home;
+        }
+
+        // More robust way in fallback
+        struct passwd* pwd = getpwuid(getuid());
+        if (pwd && pwd->pw_dir) {
+            homeDir = pwd->pw_dir;
+        }
+
+        return homeDir / localDir / std::filesystem::path("NewIconGrabber_root");
+
+#elifdef _WIN32
+        wchar_t path[MAX_PATH];
+
+        if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_PROFILE, nullptr, 0, path))) {
+            return std::filesystem::path(path) / std::filesystem::path("AppDAta/Local/NewIconGrabber_root");
+        }
+#endif
+        return "";
     }
 } // namespace utils

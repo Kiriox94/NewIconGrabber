@@ -2,8 +2,8 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "CMake: Build and run active project",
-            "command": "cmake -B build -DPLATFORM_SWITCH=ON && /usr/bin/cmake --build build --target run",
+            "label": "CMake [PC]: Build and run active project",
+            "command": "cmake -B build_pc -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Debug && /usr/bin/cmake --build build_pc --parallel --target run",
             "problemMatcher": [
                 "$gcc"
             ],
@@ -14,8 +14,8 @@
         },
         {
             "type": "shell",
-            "label": "CMake: Build active project",
-            "command": "cmake -B build -DPLATFORM_SWITCH=ON && /usr/bin/cmake --build build",
+            "label": "CMake [Nintendo Switch]: Build and run active project",
+            "command": "cmake -B build -DPLATFORM_SWITCH=ON && /usr/bin/cmake --build build --parallel --target run",
             "problemMatcher": [
                 "$gcc"
             ],

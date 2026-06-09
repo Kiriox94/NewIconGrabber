@@ -1,7 +1,6 @@
 #pragma once
 #include <borealis.hpp>
 #include "svg_image.hpp"
-#include <borealis.hpp>
 #include "views/auto_tab_frame.hpp"
 #include <vector>
 #include <filesystem>

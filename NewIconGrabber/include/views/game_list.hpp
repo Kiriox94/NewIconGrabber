@@ -1,8 +1,10 @@
 #pragma once
-#include "utils/utils.hpp"
 #include "recycling_grid.hpp"
 #include "auto_tab_frame.hpp"
+
+#ifdef __SWITCH__
 #include <nxtc.h>
+#endif
 
 class GameCell : public RecyclingGridItem
 {
@@ -15,6 +17,7 @@ public:
   BRLS_BIND(brls::Image, image, "image");
 };
 
+#ifdef __SWITCH__
 class GameData : public RecyclingGridDataSource
 {
 public:
@@ -29,6 +32,7 @@ private:
   std::function<void(std::string)> selectCallback;
   std::vector<NxTitleCacheApplicationMetadata*> games;
 };
+#endif
 
 class GameListView : public AttachedView
 {

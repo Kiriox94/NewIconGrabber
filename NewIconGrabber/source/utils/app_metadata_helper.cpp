@@ -1,8 +1,10 @@
 #include "utils/app_metadata_helper.hpp"
+#ifdef __SWITCH__
 #include <switch.h>
 #include <sstream>
-#include <string.h> 
 #include <borealis/core/logger.hpp>
+#include <regex>
+#include <iomanip>
 
 namespace appMetadataHelper
 {
@@ -47,4 +49,26 @@ namespace appMetadataHelper
         brls::Logger::info("{} fetched from title cache", metadata->name);
         return metadata;
     }
+
+    std::optional<u64> extractTitleIDFromString(const std::string& input) {
+        std::regex titleIdRegex(R"(0100[a-fA-F0-9]{12})");
+        std::smatch match;
+        u64 tid;
+
+        if (std::regex_search(input, match, titleIdRegex)) {
+            std::istringstream buffer(match.str());
+            buffer >> std::hex >> tid;
+            return tid; // Return first match
+        }
+
+        return std::nullopt; // No Title ID found
+    }
+
+    std::string formatApplicationId(u64 ApplicationId)
+    {
+        std::stringstream strm;
+        strm << std::uppercase << std::setfill('0') << std::setw(16) << std::hex << ApplicationId;
+        return strm.str();
+    }
 } // namespace appMetadataHelper
+#endif

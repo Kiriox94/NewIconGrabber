@@ -104,10 +104,10 @@ void FSData::didSelectRowAt(brls::RecyclerFrame* recycler, brls::IndexPath index
             }
         };
 
-        auto foundTID = utils::extractTitleIDFromString(fileEntries[indexPath.row].path().filename().string());
+#ifdef __SWITCH__
+        auto foundTID = appMetadataHelper::extractTitleIDFromString(fileEntries[indexPath.row].path().filename().string());
         if (foundTID) {
             std::string gameTitle = appMetadataHelper::getMetadataFromTitleId(*foundTID)->name;
-            // brls::Logger::info("Found title ID {} in filename, corresponding to game: {}", utils::formatApplicationId(*foundTID), gameTitle ? *gameTitle : "Unknown");
             auto box   = new brls::Box();
             auto img   = new brls::Image();
             auto label = new brls::Label();
@@ -123,7 +123,7 @@ void FSData::didSelectRowAt(brls::RecyclerFrame* recycler, brls::IndexPath index
             box->setMargins(20, 20, 20, 20);
             auto dialog = new brls::Dialog(box);
             dialog->addButton("Yes", [foundTID, callback]() {
-                callback(utils::formatApplicationId(*foundTID));
+                callback(appMetadataHelper::formatApplicationId(*foundTID));
             });
             dialog->addButton("No", []() {});
             dialog->addButton("To another game", [this, recycler, callback]() {
@@ -133,6 +133,7 @@ void FSData::didSelectRowAt(brls::RecyclerFrame* recycler, brls::IndexPath index
             dialog->open();
             return;
         }
+#endif
 
         auto* frame = new brls::AppletFrame(static_cast<brls::Box*>(new GameListView(callback)));
         brls::Application::pushActivity(new brls::Activity(frame));

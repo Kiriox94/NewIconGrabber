@@ -1,7 +1,6 @@
 #pragma once
 #include <nlohmann/json.hpp>
-
-#define CONFIG_PATH "sdmc:/config/NewIconGrabber/config.json"
+#include <string>
 
 struct AssetProfil{
     std::string name;

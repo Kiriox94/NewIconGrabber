@@ -4,6 +4,7 @@
 #include "utils/app_metadata_helper.hpp"
 #include "utils/icons_files_helper.hpp"
 #include <filesystem>
+#include "utils/utils.hpp"
 
 GameCell::GameCell()
 {
@@ -20,6 +21,7 @@ void GameCell::onFocusLost() {
     label->setSingleLine(true);
 }
 
+#ifdef __SWITCH__
 GameData::GameData(std::function<void(std::string)> callback) {
     selectCallback = callback;
     games = appMetadataHelper::getInstalledGames();
@@ -28,7 +30,7 @@ GameData::GameData(std::function<void(std::string)> callback) {
 
 RecyclingGridItem* GameData::cellForRow(RecyclingGrid* recycler, size_t index)
 {
-    std::string tid = utils::formatApplicationId(games[index]->title_id);
+    std::string tid = appMetadataHelper::formatApplicationId(games[index]->title_id);
     auto cell = (GameCell*)recycler->dequeueReusableCell("Cell");
     cell->label->setText(games[index]->name);
     cell->label->setTextColor(nvgRGB(255, 255, 255));
@@ -70,7 +72,7 @@ size_t GameData::getItemCount() {
 
 void GameData::onItemSelected(RecyclingGrid* recycler, size_t index)
 {
-    std::string tid = utils::formatApplicationId(games[index]->title_id);
+    std::string tid = appMetadataHelper::formatApplicationId(games[index]->title_id);
     if (!selectCallback) {
         recycler->present(new SearchGamesView(games[index]->name, tid));
     }else {
@@ -81,6 +83,7 @@ void GameData::onItemSelected(RecyclingGrid* recycler, size_t index)
 void GameData::clearData() {
     games.clear();
 }
+#endif
 
 GameListView::GameListView(std::function<void(std::string)> callback) {
     selectCallback = callback;
@@ -92,7 +95,9 @@ GameListView::GameListView(std::function<void(std::string)> callback) {
     recycler->estimatedRowHeight = 150;
     recycler->spanCount = 7;
     recycler->registerCell("Cell", []() { return new GameCell();});
+#ifdef __SWITCH__
     recycler->setDataSource(new GameData(callback));
+#endif
 }
 
 void GameListView::onCreate() {

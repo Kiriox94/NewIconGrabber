@@ -4,9 +4,7 @@
 
 namespace iconsFilesHelper {
     void overwriteIcon(std::string titleId, std::string imagePath = "", std::vector<unsigned char> imageBuffer = {});
-    inline std::string getIconDir(std::string tid) {
-        return "sdmc:/atmosphere/contents/" + tid + "/";
-    }
+    std::string getIconDir(std::string tid);
 
     struct IconScale {
         std::string name;

@@ -1,9 +1,7 @@
 #include <borealis.hpp>
-#include <switch.h>
 #include <filesystem>
 #include <iostream>
 #include "utils/config.hpp"
-#include <nxtc.h>
 #include <borealis/core/cache_helper.hpp>
 #include "utils/thread.hpp"
 
@@ -15,6 +13,12 @@
 #include "views/svg_image.hpp"
 #include "views/local_icons.hpp"
 #include "views/gallery_view.hpp"
+#include "utils/utils.hpp"
+
+#ifdef __SWITCH__
+#include <switch.h>
+#include <nxtc.h>
+#endif
 
 int main(int argc, char* argv[]) {     
     for (int i = 1; i < argc; i++) {
@@ -31,7 +35,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Init services
-#if __SWITCH__
+#ifdef __SWITCH__
     nsInitialize();
     nxtcInitialize();
     if (brls::Logger::getLogLevel() >= brls::LogLevel::LOG_DEBUG) {
@@ -75,6 +79,8 @@ int main(int argc, char* argv[]) {
     } else {
         brls::Application::pushActivity(new AppletModeActivity());
     }
+
+    brls::Logger::info("Current root directory: {}", utils::getRootDirectory());
 
     while (brls::Application::mainLoop());
 

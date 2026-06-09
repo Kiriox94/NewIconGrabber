@@ -1,6 +1,10 @@
 #include "utils/config.hpp"
+#include "utils/utils.hpp"
 #include <fstream>
 #include <borealis/core/logger.hpp>
+
+const std::string configDirectory = utils::getRootDirectory() + "/config/NewIconGrabber";
+const std::string configFilePath = configDirectory + "/config.json";
 
 namespace config {
     AssetProfil getCurrentAssetProfil() {
@@ -17,10 +21,10 @@ namespace config {
 
     void load() {
         try {
-            if (std::filesystem::exists(CONFIG_PATH)) {
+            if (std::filesystem::exists(configFilePath)) {
                 brls::Logger::info("Loading config from file");
 
-                std::ifstream i(CONFIG_PATH);
+                std::ifstream i(configFilePath);
 
                 nlohmann::json j;
                 i >> j;
@@ -37,11 +41,11 @@ namespace config {
 
     void save() {
         try {
-            if (!std::filesystem::exists("sdmc:/config/NewIconGrabber/"))
-                if (!std::filesystem::create_directories("sdmc:/config/NewIconGrabber/"))
+            if (!std::filesystem::exists(configDirectory))
+                if (!std::filesystem::create_directories(configDirectory))
                     brls::Logger::error("Could not create config directory");
 
-            std::ofstream o(CONFIG_PATH);
+            std::ofstream o(configFilePath);
             nlohmann::json j = settings;
             o << j.dump(4) << std::endl;
             brls::Logger::info("Saved config");
