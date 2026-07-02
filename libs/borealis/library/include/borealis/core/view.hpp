@@ -172,7 +172,7 @@ enum class ShadowType
 struct AppletFrameItem {
     std::string title;
     std::string iconPath;
-    int iconTexture;
+    int iconTexture = 0;
 
     void setIconFromRes(std::string name)
     {
@@ -190,7 +190,7 @@ struct AppletFrameItem {
 
     void setIconFromTexture(int texture)
     {
-        iconTexture = texture;
+        this->iconTexture = texture;
     }
 
     void setHintView(View* hintView);
