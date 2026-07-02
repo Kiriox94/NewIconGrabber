@@ -43,8 +43,14 @@ brls::RecyclerCell* SGDBData::cellForRow(brls::RecyclerFrame* recycler, brls::In
     auto* cell = (SGDBCell*)recycler->dequeueReusableCell("Cell");
     cell->label->setText(!game.year.empty() ? fmt::format("{} ({})", game.name, game.year) : game.name);
 
-    if (config::settings.displaySearchResultsIcons && !game.iconUrl.empty())  {
-        ImageHelper::with(cell->image, game.iconUrl);
+    if (config::settings.displaySearchResultsIcons) {
+        if (!game.iconUrl.empty())  {
+            ImageHelper::with(cell->image, game.iconUrl);
+        }else {
+            cell->image->setImageFromRes("img/question_mark.png");
+        }
+    } else {
+        cell->image->setVisibility(brls::Visibility::GONE);
     }
 
     return cell;

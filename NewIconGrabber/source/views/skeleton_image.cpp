@@ -1,7 +1,5 @@
 #include "views/skeleton_image.hpp"
 
-// brls::Image* SkeletonImage::create() { return new SkeletonImage(); }
-
 void SkeletonImage::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
                         brls::FrameContext* ctx) {
     if (this->getTexture() == 0) {
