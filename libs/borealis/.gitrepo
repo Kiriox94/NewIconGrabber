@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/Kiriox94/borealis.git
 	branch = wiliwili
-	commit = bdd191e304ce8dfd425e281e22eed7a6ba8273d9
-	parent = 8abde437d71453c47214d0d672cd1e8520193308
+	commit = 3e5dea3053015f78d50901cf7e24ef549d858cd3
+	parent = 0221f8c71078807211a7179e4f72a01c12345b1c
 	method = merge
 	cmdver = 0.4.9
