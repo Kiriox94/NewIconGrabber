@@ -23,7 +23,7 @@ IconCell::IconCell()
     cornerRadius="12"
     highlightCornerRadius="15">
 
-        <brls:Image
+        <SkeletonImage
             id="image"
             grow="1"
             scalingType="fill"
@@ -43,7 +43,6 @@ RecyclingGridItem* IconData::cellForRow(RecyclingGrid* recycler, size_t index)
     // brls::Logger::info("Cell width: {}", cell->getWidth());
 
     std::string url = icons[index];
-    cell->image->setImageFromRes("img/placeholder.png");
     ImageHelper::with(cell->image, url);
     return cell;
 }

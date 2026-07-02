@@ -43,8 +43,10 @@ brls::RecyclerCell* SGDBData::cellForRow(brls::RecyclerFrame* recycler, brls::In
     auto* cell = (SGDBCell*)recycler->dequeueReusableCell("Cell");
     cell->label->setText(!game.year.empty() ? fmt::format("{} ({})", game.name, game.year) : game.name);
 
-    cell->image->setImageFromRes("img/borealis_96.png");
-    if(config::settings.displaySearchResultsIcons && !game.iconUrl.empty()) ImageHelper::with(cell->image, game.iconUrl);
+    if (config::settings.displaySearchResultsIcons && !game.iconUrl.empty())  {
+        ImageHelper::with(cell->image, game.iconUrl);
+    }
+
     return cell;
 }
 

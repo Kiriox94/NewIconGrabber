@@ -5,7 +5,7 @@
     paddingTop="12.5"
     paddingBottom="12.5">
 
-    <SVGImage
+    <SkeletonImage
         id="image"
         width="44px"
         height="44px"

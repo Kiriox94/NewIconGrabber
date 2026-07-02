@@ -4,6 +4,7 @@
 #include "utils/config.hpp"
 #include <borealis/core/cache_helper.hpp>
 #include "utils/thread.hpp"
+#include "utils/utils.hpp"
 
 #include "activity/main_activity.hpp"
 #include "activity/appletmode_activity.hpp"
@@ -13,7 +14,7 @@
 #include "views/svg_image.hpp"
 #include "views/local_icons.hpp"
 #include "views/gallery_view.hpp"
-#include "utils/utils.hpp"
+#include "views/skeleton_image.hpp"
 
 #ifdef __SWITCH__
 #include <switch.h>
@@ -54,6 +55,7 @@ int main(int argc, char* argv[]) {
 
     brls::Application::createWindow("NewIconGrabber");
     brls::Application::setGlobalQuit(true);
+    brls::Application::getPlatform()->setThemeVariant(brls::ThemeVariant::DARK);
 
     //XML View
     brls::Application::registerXMLView("SettingsTab", SettingsTab::create);
@@ -63,6 +65,7 @@ int main(int argc, char* argv[]) {
     brls::Application::registerXMLView("AutoTabFrame", AutoTabFrame::create);
     brls::Application::registerXMLView("SVGImage", SVGImage::create);
     brls::Application::registerXMLView("GalleryView", GalleryView::create);
+    brls::Application::registerXMLView("SkeletonImage", SkeletonImage::create);
 
     // Add custom values to the theme
     brls::Theme::getLightTheme().addColor("captioned_image/caption", nvgRGB(2, 176, 183));
