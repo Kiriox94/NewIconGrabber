@@ -56,20 +56,15 @@ void IconData::onItemSelected(RecyclingGrid* recycler, size_t index)
     std::string url = icons[index];
     auto callback = [recycler, url](std::string tid) {
         if (!tid.empty()) {
-            try
-            {
+            try {
                 std::string response = HTTP::get(url);
                 std::vector<uint8_t> imageBuffer(response.begin(), response.end());
                 iconsFilesHelper::overwriteIcon(tid, "", imageBuffer);
                 brls::Application::notify("Icon applied");
                 recycler->getAppletFrame()->popToRootContentView();
-            }
-            catch(const iconsFilesHelper::OverwriteIconException e)
-            {
+            } catch(const iconsFilesHelper::OverwriteIconException& e) {
                 brls::Application::notify(fmt::format("Icon Error: {}", e.what()));
-            }
-            catch(const std::exception& e)
-            {
+            } catch(const std::exception& e) {
                 brls::Application::notify("Error: Icon not applied");
             }
         }
@@ -126,6 +121,7 @@ IconListView::IconListView(long SGDBGameId, std::string tid, std::string iconUrl
     for (const auto& p : config::allowedSortsOrders) {
         sortOrderNames.push_back(p.second);
     }
+
     recycler->registerAction("Sort Order", brls::BUTTON_X, [this, sortOrderNames](brls::View* view) {
         auto* dropdown = new brls::Dropdown("Set Sort Order", sortOrderNames, [this](int index) {;
             sortOrder = index;
@@ -137,16 +133,22 @@ IconListView::IconListView(long SGDBGameId, std::string tid, std::string iconUrl
         brls::Application::pushActivity(new brls::Activity(dropdown), brls::TransitionAnimation::FADE);
         return true;
     });
+
     recycler->estimatedRowHeight = config::getCurrentAssetProfil().rowHeight;
     recycler->spanCount = config::getCurrentAssetProfil().spanCount;
     recycler->registerCell("Cell", []() { return new IconCell();});
     recycler->onNextPage([this] {
         if (currentPage < pagesCount) {
             currentPage++;
-            ThreadPool::instance().submit([this](HTTP& s) { this->requestAssets(); });
+            ThreadPool::instance().submit([this](HTTP& s) {
+                this->requestAssets();
+            });
         }
     });
-    requestAssets();
+
+    brls::async([this]() {
+        this->requestAssets();
+    });
 }
 
 IconListView::~IconListView() {
@@ -157,7 +159,7 @@ void IconListView::requestAssets() {
     std::string title = "";
     std::vector<std::string> icons;
     
-    try{
+    try {
         SGDB::SearchResult result = SGDB::getAssetsForGame(
             gameId, 
             "grid", 
@@ -170,7 +172,7 @@ void IconListView::requestAssets() {
         );
 
         if (result.total <= 0) {
-            title = "No icons found.";
+            title = "No icons found";
             recycler->setEmpty();
         }else {
             pagesCount = std::ceil(result.total / config::getCurrentAssetProfil().pageSize);
@@ -181,8 +183,8 @@ void IconListView::requestAssets() {
                 icons.push_back(url);
             }
         }
-    }catch (const std::exception& e) {
-        title = "Failed to fetch icons.";
+    } catch (const std::exception& e) {
+        title = "Failed to fetch icons";
         recycler->setError(fmt::format("Request error: {}", e.what()));
     }
     
