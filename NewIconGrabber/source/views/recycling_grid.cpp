@@ -3,6 +3,7 @@
 //
 
 #include <utility>
+#include <typeinfo>
 #include "views/recycling_grid.hpp"
 #include "views/button_refresh.hpp"
 using namespace brls::literals;
@@ -727,8 +728,11 @@ float RecyclingGrid::getPaddingRight() {
 }
 
 brls::View* RecyclingGrid::getDefaultFocus() {
-    if (this->dataSource && this->dataSource->getItemCount() > 0) return ScrollingFrame::getDefaultFocus();
-    return this;
+    if (this->dataSource && this->dataSource->getItemCount() > 0 && typeid(*this->dataSource) != typeid(DataSourceSkeleton)) {
+        return ScrollingFrame::getDefaultFocus();
+    } else {
+        return this;
+    }
 }
 
 brls::View* RecyclingGrid::create() { return new RecyclingGrid(); }
