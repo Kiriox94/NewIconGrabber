@@ -123,12 +123,16 @@ IconListView::IconListView(long SGDBGameId, std::string tid, std::string iconUrl
     }
 
     recycler->registerAction("Sort Order", brls::BUTTON_X, [this, sortOrderNames](brls::View* view) {
-        auto* dropdown = new brls::Dropdown("Set Sort Order", sortOrderNames, [this](int index) {;
+        auto* dropdown = new brls::Dropdown("Set Sort Order", sortOrderNames, [this](int index) {
             sortOrder = index;
+            currentPage = 0;
+
             recycler->clearData();
             recycler->showSkeleton();
-            currentPage = 0;
-            requestAssets();
+            
+            ThreadPool::instance().submit([this](HTTP& s) {
+                this->requestAssets();
+            });
         }, sortOrder);
         brls::Application::pushActivity(new brls::Activity(dropdown), brls::TransitionAnimation::FADE);
         return true;
@@ -146,7 +150,7 @@ IconListView::IconListView(long SGDBGameId, std::string tid, std::string iconUrl
         }
     });
 
-    brls::async([this]() {
+    ThreadPool::instance().submit([this](HTTP& s) {
         this->requestAssets();
     });
 }
@@ -176,7 +180,7 @@ void IconListView::requestAssets() {
             recycler->setEmpty();
         }else {
             pagesCount = std::ceil(result.total / config::getCurrentAssetProfil().pageSize);
-            title = fmt::format("Icons for {} ({})", result.game.name, result.total);
+            title = fmt::format("{} ({} icons)", result.game.name, result.total);
 
             for (auto& asset : result.assets) {
                 std::string url = asset.thumb;
@@ -198,8 +202,7 @@ void IconListView::requestAssets() {
             recycler->notifyDataChanged();
         }else {
             recycler->setDataSource(new IconData(icons));
+            brls::Application::giveFocus(recycler);
         }
-
-        brls::Application::giveFocus(recycler);
     });
 }
